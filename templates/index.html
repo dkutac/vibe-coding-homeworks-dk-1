@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My.App.Person</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f5f5f5;
+      color: #212121;
+    }
+
+    header {
+      background: #1565c0;
+      color: #fff;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,.3);
+    }
+
+    header span.material-symbols-outlined { font-size: 28px; }
+    header h1 { font-size: 1.25rem; font-weight: 500; }
+
+    main { max-width: 900px; margin: 32px auto; padding: 0 16px; }
+
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.15);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .card h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #1565c0;
+    }
+
+    form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    form .full { grid-column: 1 / -1; }
+
+    label { font-size: .8rem; color: #666; display: block; margin-bottom: 4px; }
+
+    input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: .95rem;
+    }
+
+    input:focus { outline: none; border-color: #1565c0; box-shadow: 0 0 0 2px rgba(21,101,192,.2); }
+
+    .btn {
+      padding: 8px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: .9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary { background: #1565c0; color: #fff; }
+    .btn-primary:hover { background: #0d47a1; }
+    .btn-danger  { background: #c62828; color: #fff; padding: 4px 10px; font-size: .8rem; }
+    .btn-danger:hover { background: #b71c1c; }
+    .btn-edit    { background: #e3f2fd; color: #1565c0; padding: 4px 10px; font-size: .8rem; }
+    .btn-edit:hover { background: #bbdefb; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 10px 12px; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: #666; border-bottom: 2px solid #e0e0e0; }
+    td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; font-size: .9rem; vertical-align: middle; }
+    tr:hover td { background: #fafafa; }
+
+    .actions { display: flex; gap: 6px; }
+
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #323232;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 4px;
+      font-size: .9rem;
+      opacity: 0;
+      transition: opacity .3s;
+      pointer-events: none;
+    }
+    #toast.show { opacity: 1; }
+
+    #edit-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.4);
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    #edit-modal.open { display: flex; }
+    #edit-modal .card { width: 400px; margin: 0; }
+    #edit-modal .card h2 { color: #e65100; }
+    #edit-modal form { grid-template-columns: 1fr; }
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="material-symbols-outlined">group</span>
+  <h1>My.App.Person — CRUD Demo</h1>
+</header>
+
+<main>
+  <div class="card">
+    <h2><span class="material-symbols-outlined">person_add</span> Add Person</h2>
+    <form id="add-form">
+      <div>
+        <label>Name</label>
+        <input id="add-name" type="text" placeholder="Full name" required>
+      </div>
+      <div>
+        <label>Date of Birth</label>
+        <input id="add-dob" type="date">
+      </div>
+      <div class="full">
+        <label>Email</label>
+        <input id="add-email" type="email" placeholder="email@example.com">
+      </div>
+      <div class="full" style="display:flex;justify-content:flex-end">
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-plus-lg"></i> Add
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2><span class="material-symbols-outlined">table_view</span> People</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th><th>Name</th><th>Date of Birth</th><th>Email</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</main>
+
+<div id="edit-modal">
+  <div class="card">
+    <h2><span class="material-symbols-outlined">edit</span> Edit Person</h2>
+    <form id="edit-form">
+      <input type="hidden" id="edit-id">
+      <div>
+        <label>Name</label>
+        <input id="edit-name" type="text" required>
+      </div>
+      <div>
+        <label>Date of Birth</label>
+        <input id="edit-dob" type="date">
+      </div>
+      <div>
+        <label>Email</label>
+        <input id="edit-email" type="email">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-edit" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  const tbody = document.getElementById('tbody');
+
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2500);
+  }
+
+  function fmtDate(val) {
+    if (!val) return '—';
+    const d = new Date(val);
+    return isNaN(d) ? val : d.toLocaleDateString();
+  }
+
+  async function loadPersons() {
+    const res = await fetch('/persons');
+    const data = await res.json();
+    tbody.innerHTML = data.map(p => `
+      <tr>
+        <td>${p.ID}</td>
+        <td>${p.Name ?? ''}</td>
+        <td>${fmtDate(p.DOB)}</td>
+        <td>${p.Email ?? ''}</td>
+        <td class="actions">
+          <button class="btn btn-edit" onclick="openEdit(${p.ID},'${(p.Name??'').replace(/'/g,"\\'")}','${p.DOB??''}','${(p.Email??'').replace(/'/g,"\\'")}')">
+            <i class="bi bi-pencil"></i> Edit
+          </button>
+          <button class="btn btn-danger" onclick="deletePerson(${p.ID})">
+            <i class="bi bi-trash"></i>
+          </button>
+        </td>
+      </tr>`).join('');
+  }
+
+  document.getElementById('add-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    await fetch('/persons', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name:  document.getElementById('add-name').value,
+        dob:   document.getElementById('add-dob').value || null,
+        email: document.getElementById('add-email').value,
+      }),
+    });
+    e.target.reset();
+    toast('Person added.');
+    loadPersons();
+  });
+
+  async function deletePerson(id) {
+    if (!confirm('Delete this person?')) return;
+    await fetch(`/persons/${id}`, { method: 'DELETE' });
+    toast('Person deleted.');
+    loadPersons();
+  }
+
+  function openEdit(id, name, dob, email) {
+    document.getElementById('edit-id').value = id;
+    document.getElementById('edit-name').value = name;
+    document.getElementById('edit-dob').value = dob ? dob.split('T')[0] : '';
+    document.getElementById('edit-email').value = email;
+    document.getElementById('edit-modal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('edit-modal').classList.remove('open');
+  }
+
+  document.getElementById('edit-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const id = document.getElementById('edit-id').value;
+    await fetch(`/persons/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name:  document.getElementById('edit-name').value,
+        dob:   document.getElementById('edit-dob').value || null,
+        email: document.getElementById('edit-email').value,
+      }),
+    });
+    closeModal();
+    toast('Person updated.');
+    loadPersons();
+  });
+
+  loadPersons();
+</script>
+</body>
+</html>

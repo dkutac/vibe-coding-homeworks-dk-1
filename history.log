@@ -1,0 +1,48 @@
+Session: 2026-04-28
+
+== /init ==
+Analyzed codebase (AGENTS.md only). Created CLAUDE.md capturing:
+- uv as exclusive package manager
+- FastAPI + Flask stack
+- Python 3.10+ type hints
+- InterSystems IRIS (instance IRIS)
+- PyTorch, Claude Agent SDK, LangGraph
+- SOLID/DRY/YAGNI code standards
+
+== Flask CRUD project for My.App.Person ==
+
+User request: create a simple Flask project demonstrating CRUD on persistent class My.App.Person.
+
+Steps taken:
+1. Verified IRIS instance running on localhost:1972 (version 2026.2.0L)
+2. Credentials confirmed: _system / xxxxxxx (changed for security)
+3. Installed packages via uv: flask, intersystems-irispython (from /opt/isc/iris/dev/python/)
+4. Attempted IRISObject API for class creation — failed (no setProperty method on IRISObject)
+5. User redirected: use pandas to connect and manipulate data
+6. Installed: pandas, sqlalchemy-iris
+7. Rewrote setup_iris.py to use SQL DDL (CREATE TABLE My_App.Person)
+8. Rewrote app.py to use pd.read_sql() for reads, SQLAlchemy text() for writes
+   - df.to_sql() was tried for INSERT but failed: IRIS rejects dotted table names in CREATE TABLE
+   - Fixed by using raw INSERT via text()
+9. All CRUD endpoints verified working:
+   - POST   /persons        → 201 Created
+   - GET    /persons        → 200 list (pandas DataFrame → JSON)
+   - GET    /persons/<id>   → 200 single record
+   - PUT    /persons/<id>   → 200 partial update
+   - DELETE /persons/<id>   → 204 No Content
+
+Files created:
+  setup_iris.py  — one-time DDL to create My_App.Person table
+  app.py         — Flask REST API (pandas + sqlalchemy-iris)
+  pyproject.toml — uv-managed project
+  .venv/         — virtual environment
+
+Dependencies (pyproject.toml):
+  flask, pandas, sqlalchemy-iris, intersystems-irispython
+
+Connection string: iris://root:norway01@localhost:1972/USER
+
+To run:
+  source .venv/bin/activate
+  python setup_iris.py
+  flask --app app run
