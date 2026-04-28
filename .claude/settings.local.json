@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//home/kutac/projects/claude/**)",
+      "Bash(grep -E \"\\\\.\\(py|json|md|txt|toml|yaml\\)$\")",
+      "Bash(python3 -c \"import iris; print\\('iris ok'\\)\")",
+      "Bash(uv --version)",
+      "Read(//usr/**)",
+      "Read(//opt/**)",
+      "Bash(/opt/isc/iris/bin/iris list *)",
+      "Bash(uv init *)",
+      "Bash(uv venv *)",
+      "Bash(uv add *)",
+      "Bash(gh repo *)",
+      "Bash(git remote *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
+    ]
+  }
+}

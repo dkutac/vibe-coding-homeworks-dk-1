@@ -40,7 +40,7 @@ Files created:
 Dependencies (pyproject.toml):
   flask, pandas, sqlalchemy-iris, intersystems-irispython
 
-Connection string: iris://root:norway01@localhost:1972/USER
+Connection string: iris://root:xxxxx@localhost:1972/USER
 
 To run:
   source .venv/bin/activate
