@@ -122,7 +122,7 @@ Write code that is **simple, maintainable, and production-ready**. Prioritize cl
 ### Infrastructure & DevOps
 
 **InterSystems IRIS***
-    - use instance 'IRIS' of InterSystems iris
+    - use instance 'IRIS' of InterSystems IRIS which isd installed locally
 
 **Networking:**
 
